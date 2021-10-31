@@ -1,13 +1,12 @@
 import pygame, random
-from pygame import display
 from pygame import time
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w
-from pygame.rect import Rect
 
 pygame.init()
 width, heigth = 1300, 700
 
 snake_color = (144,238,144)
+
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
@@ -35,26 +34,26 @@ def move_snake(x, y, left, right, up, down, points):
         if x - vel < 0:
             lost = True
         else:
-            x -= vel
+            x -= snake_size
 
     if right:
         if x + vel + 20 > width:
             print("b")
             lost = True
         else:
-            x += vel
+            x += snake_size
 
     if up:
         if y - vel < 0:
             lost = True
         else:
-            y -= vel
+            y -= snake_size
 
     if down:
         if y + vel + 20 > heigth:
             lost = True
         else:
-            y += vel
+            y += snake_size
 
     return x, y, lost
 
@@ -100,10 +99,10 @@ def display_points(points):
     win.blit(text, textRect)
 
 def draw_lines():
-    for i in range(width//snake_size):
+    for i in range(width//snake_size + vel):
         pygame.draw.line(win, white, (snake_size*i, 0), (snake_size*i, heigth*i))
 
-    for i in range(heigth//snake_size):
+    for i in range(heigth//snake_size + vel):
         pygame.draw.line(win, white, (0, snake_size*i), (width, snake_size*i))
 
 def display_death_message():
