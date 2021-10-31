@@ -21,6 +21,7 @@ windows_xp = pygame.mixer.Sound(r"assets/windows_xp.mp3")
 classic_hurt = pygame.mixer.Sound(r"assets/classic_hurt.mp3")
 horn = pygame.mixer.Sound(r"assets/horn.mp3")
 windows_xp2 = pygame.mixer.Sound("assets/windows_xp2.mp3") 
+eating = pygame.mixer.Sound(r"assets/eating.mp3")
 
 font = pygame.font.Font('freesansbold.ttf', 20)
 death_font = pygame.font.Font('freesansbold.ttf', 32)
@@ -146,6 +147,7 @@ def get_high_score(score):
         file = open("high_score.txt", "w")
         file.write(str(score))
         high_score = score
+        file.close()
 
     return int(high_score)
 
@@ -199,6 +201,7 @@ def main():
             no_apple = handle_colision(apple_x, apple_y, x, y)
 
             if no_apple == True:#The snake colided with the apple increase the ponints by 1
+                eating.play()
                 score += 1
                 tails.append(last_movement)
             display_points(score)
