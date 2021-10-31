@@ -1,15 +1,18 @@
 import pygame, random
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w
+from pygame.rect import Rect
 
 pygame.init()
 width, heigth = 1300, 700
 
 snake_color = (144,238,144)
 black = (0, 0, 0)
+white = (255, 255, 255)
 
-vel = 3
+snake_size = 20
+vel = 2
 fps = 80
-font = pygame.font.Font('freesansbold.ttf', 32)
+font = pygame.font.Font('freesansbold.ttf', 20)
 
 win = pygame.display.set_mode((width, heigth))
 pygame.display.set_caption('Snake game')
@@ -18,7 +21,7 @@ def draw_snake(x, y, points):
     # if points != 0:
     #     snake = pygame.Rect(x, y, 20 * points, 20)
     # else:
-    snake = pygame.Rect(x, y, 20, 20)
+    snake = pygame.Rect(x, y, snake_size, snake_size)
     pygame.draw.rect(win, snake_color, snake)
 
 #Moves the snake by updating the x and y values
@@ -57,8 +60,15 @@ def handle_keys(key, keys_pressed):
         keys_pressed["down"] = True
 
 def generate_apples():
-    x = random.randint(0, width)
-    y = random.randint(0, heigth)
+    while True:
+        x = random.randint(1, width - 1)
+        if x % 2 == 0:
+            break
+
+    while True:
+        y = random.randint(1, heigth - 1)
+        if y % 2 == 0:
+            break
     return x, y
 
 def handle_colision(apple_x, apple_y, x, y):
@@ -70,11 +80,18 @@ def handle_colision(apple_x, apple_y, x, y):
     return False
 
 def display_points(points):
-    font = pygame.font.Font('freesansbold.ttf', 20)
-    text = font.render(f"Score: {points}", True, (255, 255, 255))
+    text = font.render(f"Score: {points}", True, white)
     textRect = text.get_rect()
     textRect.center = (50, 20)
     win.blit(text, textRect)
+
+
+def draw_lines():
+    for i in range(width//snake_size):
+        pygame.draw.line(win, white, (snake_size*i, 0), (snake_size*i, heigth*i))
+
+    for i in range(heigth//snake_size):
+        pygame.draw.line(win, white, (0, snake_size*i), (width, snake_size*i))
 
 def main():
     x, y = width//2, heigth//2 #The x and y of the snake
@@ -82,6 +99,8 @@ def main():
 
     keys_pressed = {"left":False, "right":False, "up":False, "down":False}#the values that will turn True when the apopriate key is pressed
     no_apple, run = True, True
+
+    
 
     clock = pygame.time.Clock()
 
@@ -98,6 +117,7 @@ def main():
                 handle_keys(event.key, keys_pressed)
                 
         if run:
+            draw_lines()
             draw_snake(x, y, points)
             x, y = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], points)
             
