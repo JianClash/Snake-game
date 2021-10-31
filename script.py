@@ -1,12 +1,13 @@
 import pygame, random
 from pygame import time
+from pygame import draw
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w
 
 pygame.init()
 width, heigth = 1300, 700
 
-snake_color = (144,238,144)
-
+snake_color = (0, 255, 0)
+tail_color = (144,238,144)
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
@@ -29,6 +30,7 @@ def draw_snake(x, y, points):
 
 #Moves the snake by updating the x and y values
 def move_snake(x, y, left, right, up, down, points):
+    last_movement = (x, y)
     lost = False
     if left:
         if x - vel < 0:
@@ -54,29 +56,35 @@ def move_snake(x, y, left, right, up, down, points):
         else:
             y += snake_size
 
-    return x, y, lost
+    return x, y, lost, last_movement
 
 #Handles the key presses by turning the apopriate value to true and others to false 
 def handle_keys(key, keys_pressed):
     if key == K_LEFT or key == K_a:#Left Arrow
+        last_input = "left"
         for key in keys_pressed: 
             keys_pressed[key] = False
         keys_pressed["left"] = True 
 
     if key == K_RIGHT or key == K_d:#Right Arrow
+        last_input = "right"
         for key in keys_pressed:
             keys_pressed[key] = False
         keys_pressed["right"] = True
 
     if key == K_UP or key == K_w:#Up Arrow
+        last_input = "up"
         for key in keys_pressed:
             keys_pressed[key] = False
         keys_pressed["up"] = True
 
     if key == K_DOWN or key == K_s:#Down arrow
+        last_input = "down"
         for key in keys_pressed:
             keys_pressed[key] = False
         keys_pressed["down"] = True
+
+    return last_input
 
 def generate_apples():
     x = random.randint(1, width - 1)
@@ -96,13 +104,6 @@ def display_points(points):
     textRect = text.get_rect()
     textRect.center = (50, 20)
     win.blit(text, textRect)
-
-def draw_lines():
-    for i in range(width//snake_size + vel):
-        pygame.draw.line(win, white, (snake_size*i, 0), (snake_size*i, heigth*i))
-
-    for i in range(heigth//snake_size + vel):
-        pygame.draw.line(win, white, (0, snake_size*i), (width, snake_size*i))
 
 def display_death_message(score, high_score):
     text = death_font.render(f"Your score:{score}", True, red)
@@ -128,9 +129,24 @@ def get_high_score(score):
 
     return int(high_score)
 
+def draw_tails(tails):
+    for i in tails:
+        tail = pygame.Rect(i[0], i[1], snake_size, snake_size)
+        pygame.draw.rect(win, tail_color, tail)
+
+def move_tails(pos, tails):
+    new_tails = []
+    for tail in tails:
+        new_tails.append(pos)
+        pos = tail
+
+    return new_tails
+
+
 def main():
     x, y = width//2 - 10, heigth//2 - 10#The x and y of the snake
     score = 0
+    tails = []
 
     keys_pressed = {"left":False, "right":False, "up":False, "down":False}#the values that will turn True when the apopriate key is pressed
     no_apple, run, lost = True, True, False
@@ -150,9 +166,10 @@ def main():
                 handle_keys(event.key, keys_pressed)
                 
         if run:
-            #draw_lines()
             draw_snake(x, y, score)
-            x, y, lost = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], score)
+            draw_tails(tails)
+            x, y, lost, last_movement = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], score)
+            tails = move_tails((last_movement), tails)
 
             if no_apple:
                 apple_x, apple_y = generate_apples()
@@ -163,6 +180,7 @@ def main():
 
             if no_apple == True:#The snake colided with the apple increase the ponints by 1
                 score += 1
+                tails.append(last_movement)
             display_points(score)
 
             if lost:
