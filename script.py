@@ -10,6 +10,7 @@ width, heigth = 1300, 700
 snake_color = (144,238,144)
 black = (0, 0, 0)
 white = (255, 255, 255)
+red = (255, 0, 0)
 
 snake_size = 20
 vel = 2
@@ -29,19 +30,33 @@ def draw_snake(x, y, points):
 
 #Moves the snake by updating the x and y values
 def move_snake(x, y, left, right, up, down, points):
+    lost = False
     if left:
         if x - vel < 0:
-            x = None 
+            lost = True
         else:
             x -= vel
-    if right and x + vel + 20 < width:
-        x += vel
-    if up and y - vel > 0:
-        y -= vel
-    if down and y + vel + 20 < heigth:
-        y += vel
 
-    return x, y
+    if right:
+        if x + vel + 20 > width:
+            print("b")
+            lost = True
+        else:
+            x += vel
+
+    if up:
+        if y - vel < 0:
+            lost = True
+        else:
+            y -= vel
+
+    if down:
+        if y + vel + 20 > heigth:
+            lost = True
+        else:
+            y += vel
+
+    return x, y, lost
 
 #Handles the key presses by turning the apopriate value to true and others to false 
 def handle_keys(key, keys_pressed):
@@ -92,7 +107,7 @@ def draw_lines():
         pygame.draw.line(win, white, (0, snake_size*i), (width, snake_size*i))
 
 def display_death_message():
-    text = death_font.render("You died!!!", True, white)
+    text = death_font.render("You died!!!", True, red)
     textRect = text.get_rect()
     textRect.center = (width//2, heigth//2)
     win.blit(text, textRect)
@@ -104,7 +119,7 @@ def main():
     points = 0
 
     keys_pressed = {"left":False, "right":False, "up":False, "down":False}#the values that will turn True when the apopriate key is pressed
-    no_apple, run = True, True
+    no_apple, run, lost = True, True, False
 
     clock = pygame.time.Clock()
 
@@ -123,12 +138,7 @@ def main():
         if run:
             draw_lines()
             draw_snake(x, y, points)
-            x, y = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], points)
-            
-            if not x or not y:
-                display_death_message()
-                run = False
-                break
+            x, y, lost = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], points)
 
             if no_apple:
                 apple_x, apple_y = generate_apples()
@@ -140,6 +150,11 @@ def main():
             if no_apple == True:#The snake colided with the apple increase the ponints by 1
                 points += 1
             display_points(points)
+
+            if lost:
+                display_death_message()
+                run = False
+                break
 
             pygame.display.update()
             win.fill(black)#fills the background color
