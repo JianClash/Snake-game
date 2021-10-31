@@ -5,8 +5,8 @@ from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w
 pygame.init()
 width, heigth = 1300, 700
 
-snake_color = (144,238,144)
-tail_color = (144,238,144)
+snake_color = (0,255,0)
+tail_color = (0,255,0)
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
@@ -22,6 +22,9 @@ classic_hurt = pygame.mixer.Sound(r"assets/classic_hurt.mp3")
 horn = pygame.mixer.Sound(r"assets/horn.mp3")
 windows_xp2 = pygame.mixer.Sound("assets/windows_xp2.mp3") 
 eating = pygame.mixer.Sound(r"assets/eating.mp3")
+
+bg = pygame.image.load(r"assets/snakeBackground.png")
+bg = pygame.transform.scale(bg, (width, heigth))
 
 font = pygame.font.Font('freesansbold.ttf', 20)
 death_font = pygame.font.Font('freesansbold.ttf', 32)
@@ -188,6 +191,7 @@ def main():
                 handle_keys(event.key, keys_pressed)
                 
         if run:
+            win.blit(bg, (0, 0))
             draw_snake(x, y, score)
             draw_tails(tails)
             x, y, lost, last_movement = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], score)
@@ -218,6 +222,7 @@ def main():
                 run = False
                 break
 
+            
             pygame.display.update()
             win.fill(black)#fills the background color
             
