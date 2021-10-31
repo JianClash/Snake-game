@@ -1,4 +1,6 @@
 import pygame, random
+from pygame import display
+from pygame import time
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w
 from pygame.rect import Rect
 
@@ -13,6 +15,7 @@ snake_size = 20
 vel = 2
 fps = 80
 font = pygame.font.Font('freesansbold.ttf', 20)
+death_font = pygame.font.Font('freesansbold.ttf', 32)
 
 win = pygame.display.set_mode((width, heigth))
 pygame.display.set_caption('Snake game')
@@ -26,8 +29,11 @@ def draw_snake(x, y, points):
 
 #Moves the snake by updating the x and y values
 def move_snake(x, y, left, right, up, down, points):
-    if left and x - vel > 0: 
-        x -= vel
+    if left:
+        if x - vel < 0:
+            x = None 
+        else:
+            x -= vel
     if right and x + vel + 20 < width:
         x += vel
     if up and y - vel > 0:
@@ -60,15 +66,8 @@ def handle_keys(key, keys_pressed):
         keys_pressed["down"] = True
 
 def generate_apples():
-    while True:
-        x = random.randint(1, width - 1)
-        if x % 2 == 0:
-            break
-
-    while True:
-        y = random.randint(1, heigth - 1)
-        if y % 2 == 0:
-            break
+    x = random.randint(1, width - 1)
+    y = random.randint(1, heigth - 1)
     return x, y
 
 def handle_colision(apple_x, apple_y, x, y):
@@ -85,7 +84,6 @@ def display_points(points):
     textRect.center = (50, 20)
     win.blit(text, textRect)
 
-
 def draw_lines():
     for i in range(width//snake_size):
         pygame.draw.line(win, white, (snake_size*i, 0), (snake_size*i, heigth*i))
@@ -93,14 +91,20 @@ def draw_lines():
     for i in range(heigth//snake_size):
         pygame.draw.line(win, white, (0, snake_size*i), (width, snake_size*i))
 
+def display_death_message():
+    text = death_font.render("You died!!!", True, white)
+    textRect = text.get_rect()
+    textRect.center = (width//2, heigth//2)
+    win.blit(text, textRect)
+    pygame.display.update()
+    time.wait(5000)
+
 def main():
-    x, y = width//2, heigth//2 #The x and y of the snake
+    x, y = width//2 - 10, heigth//2 - 10#The x and y of the snake
     points = 0
 
     keys_pressed = {"left":False, "right":False, "up":False, "down":False}#the values that will turn True when the apopriate key is pressed
     no_apple, run = True, True
-
-    
 
     clock = pygame.time.Clock()
 
@@ -121,9 +125,15 @@ def main():
             draw_snake(x, y, points)
             x, y = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], points)
             
+            if not x or not y:
+                display_death_message()
+                run = False
+                break
+
             if no_apple:
                 apple_x, apple_y = generate_apples()
                 no_apple = False
+
             pygame.draw.circle(win, (255, 0, 0), (apple_x, apple_y), 10)#Draws the apple's
             no_apple = handle_colision(apple_x, apple_y, x, y)
 
