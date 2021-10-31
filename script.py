@@ -13,7 +13,7 @@ red = (255, 0, 0)
 
 snake_size = 20
 vel = 2
-fps = 80
+fps = 10
 font = pygame.font.Font('freesansbold.ttf', 20)
 death_font = pygame.font.Font('freesansbold.ttf', 32)
 
@@ -38,7 +38,6 @@ def move_snake(x, y, left, right, up, down, points):
 
     if right:
         if x + vel + 20 > width:
-            print("b")
             lost = True
         else:
             x += snake_size
@@ -105,17 +104,33 @@ def draw_lines():
     for i in range(heigth//snake_size + vel):
         pygame.draw.line(win, white, (0, snake_size*i), (width, snake_size*i))
 
-def display_death_message():
-    text = death_font.render("You died!!!", True, red)
+def display_death_message(score, high_score):
+    text = death_font.render(f"Your score:{score}", True, red)
     textRect = text.get_rect()
     textRect.center = (width//2, heigth//2)
     win.blit(text, textRect)
+
+    highScoreText = death_font.render(f"High score:{high_score}", True, red)
+    highScoreTextRect = highScoreText.get_rect()
+    highScoreTextRect.center = (width//2, heigth//2 + 30)
+    win.blit(highScoreText, highScoreTextRect)
     pygame.display.update()
     time.wait(5000)
 
+def get_high_score(score):
+    with open("high_score.txt", "r") as file:
+        high_score = file.read()
+
+    if int(high_score) < score:
+        file = open("high_score.txt", "w")
+        file.write(str(score))
+        high_score = score
+
+    return int(high_score)
+
 def main():
     x, y = width//2 - 10, heigth//2 - 10#The x and y of the snake
-    points = 0
+    score = 0
 
     keys_pressed = {"left":False, "right":False, "up":False, "down":False}#the values that will turn True when the apopriate key is pressed
     no_apple, run, lost = True, True, False
@@ -135,9 +150,9 @@ def main():
                 handle_keys(event.key, keys_pressed)
                 
         if run:
-            draw_lines()
-            draw_snake(x, y, points)
-            x, y, lost = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], points)
+            #draw_lines()
+            draw_snake(x, y, score)
+            x, y, lost = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], score)
 
             if no_apple:
                 apple_x, apple_y = generate_apples()
@@ -147,11 +162,12 @@ def main():
             no_apple = handle_colision(apple_x, apple_y, x, y)
 
             if no_apple == True:#The snake colided with the apple increase the ponints by 1
-                points += 1
-            display_points(points)
+                score += 1
+            display_points(score)
 
             if lost:
-                display_death_message()
+                high_score = get_high_score(score)
+                display_death_message(score, high_score)
                 run = False
                 break
 
