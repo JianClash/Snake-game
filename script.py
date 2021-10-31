@@ -1,12 +1,11 @@
 import pygame, random
 from pygame import time
-from pygame import draw
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w
 
 pygame.init()
 width, heigth = 1300, 700
 
-snake_color = (0, 255, 0)
+snake_color = (144,238,144)
 tail_color = (144,238,144)
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -15,6 +14,14 @@ red = (255, 0, 0)
 snake_size = 20
 vel = 2
 fps = 10
+
+pygame.mixer.init()
+weee = pygame.mixer.Sound(r"assets/weee.mp3")
+windows_xp = pygame.mixer.Sound(r"assets/windows_xp.mp3")
+classic_hurt = pygame.mixer.Sound(r"assets/classic_hurt.mp3")
+horn = pygame.mixer.Sound(r"assets/horn.mp3")
+windows_xp2 = pygame.mixer.Sound("assets/windows_xp2.mp3") 
+
 font = pygame.font.Font('freesansbold.ttf', 20)
 death_font = pygame.font.Font('freesansbold.ttf', 32)
 
@@ -118,6 +125,19 @@ def display_death_message(score, high_score):
     pygame.display.update()
     time.wait(5000)
 
+def play_sound():
+    num = random.randint(1, 5)
+    if num == 1:
+        weee.play()
+    elif num == 2:
+        classic_hurt.play()
+    elif num == 3:
+        horn.play()
+    elif num == 4:
+        windows_xp2.play()
+    else:
+        windows_xp.play()
+
 def get_high_score(score):
     with open("high_score.txt", "r") as file:
         high_score = file.read()
@@ -182,7 +202,7 @@ def main():
                 score += 1
                 tails.append(last_movement)
             display_points(score)
-            
+
             for tail in tails:
                 if x == tail[0] and y == tail[1]:
                     lost = True
@@ -190,6 +210,7 @@ def main():
 
             if lost:
                 high_score = get_high_score(score)
+                play_sound()
                 display_death_message(score, high_score)
                 run = False
                 break
