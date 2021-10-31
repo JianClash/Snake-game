@@ -182,6 +182,11 @@ def main():
                 score += 1
                 tails.append(last_movement)
             display_points(score)
+            
+            for tail in tails:
+                if x == tail[0] and y == tail[1]:
+                    lost = True
+                    break
 
             if lost:
                 high_score = get_high_score(score)
