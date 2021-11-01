@@ -15,16 +15,15 @@ snake_size = 20
 vel = 2
 fps = 10
 
-pygame.mixer.init()
+pygame.mixer.init() 
 weee = pygame.mixer.Sound(r"assets/weee.mp3")
 windows_xp = pygame.mixer.Sound(r"assets/windows_xp.mp3")
 classic_hurt = pygame.mixer.Sound(r"assets/classic_hurt.mp3")
 horn = pygame.mixer.Sound(r"assets/horn.mp3")
 windows_xp2 = pygame.mixer.Sound("assets/windows_xp2.mp3") 
 eating = pygame.mixer.Sound(r"assets/eating.mp3")
-
-bg = pygame.image.load(r"assets/snakeBackground.png")
-bg = pygame.transform.scale(bg, (width, heigth))
+themeSong = pygame.mixer.Sound(r"assets/themeSong.mp3")
+themeSong.play(-1)
 
 font = pygame.font.Font('freesansbold.ttf', 20)
 death_font = pygame.font.Font('freesansbold.ttf', 32)
@@ -32,10 +31,7 @@ death_font = pygame.font.Font('freesansbold.ttf', 32)
 win = pygame.display.set_mode((width, heigth))
 pygame.display.set_caption('Snake game')
 
-def draw_snake(x, y, points):
-    # if points != 0:
-    #     snake = pygame.Rect(x, y, 20 * points, 20)
-    # else:
+def draw_snake(x, y):
     snake = pygame.Rect(x, y, snake_size, snake_size)
     pygame.draw.rect(win, snake_color, snake)
 
@@ -191,8 +187,8 @@ def main():
                 handle_keys(event.key, keys_pressed)
                 
         if run:
-            win.blit(bg, (0, 0))
-            draw_snake(x, y, score)
+            
+            draw_snake(x, y)
             draw_tails(tails)
             x, y, lost, last_movement = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], score)
             tails = move_tails((last_movement), tails)
@@ -216,6 +212,7 @@ def main():
                     break
 
             if lost:
+                themeSong.stop()
                 high_score = get_high_score(score)
                 play_sound()
                 display_death_message(score, high_score)
