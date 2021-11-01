@@ -15,6 +15,8 @@ snake_size = 20
 vel = 2
 fps = 10
 
+
+#Sonds effects
 pygame.mixer.init() 
 weee = pygame.mixer.Sound(r"assets/weee.mp3")
 windows_xp = pygame.mixer.Sound(r"assets/windows_xp.mp3")
@@ -36,28 +38,29 @@ def draw_snake(x, y):
     pygame.draw.rect(win, snake_color, snake)
 
 #Moves the snake by updating the x and y values
-def move_snake(x, y, left, right, up, down, points):
+def move_snake(x, y, keys_pressed):
     last_movement = (x, y)
     lost = False
-    if left:
+
+    if keys_pressed["left"]:
         if x - vel < 0:
             lost = True
         else:
             x -= snake_size
 
-    if right:
+    if keys_pressed["right"]:
         if x + vel + 20 > width:
             lost = True
         else:
             x += snake_size
 
-    if up:
+    if keys_pressed["up"]:
         if y - vel < 0:
             lost = True
         else:
             y -= snake_size
 
-    if down:
+    if keys_pressed["down"]:
         if y + vel + 20 > heigth:
             lost = True
         else:
@@ -66,32 +69,32 @@ def move_snake(x, y, left, right, up, down, points):
     return x, y, lost, last_movement
 
 #Handles the key presses by turning the apopriate value to true and others to false 
-def handle_keys(key, keys_pressed):
+def handle_keys(key, keys_pressed, key_history):
     if key == K_LEFT or key == K_a:#Left Arrow
-        last_input = "left"
         for key in keys_pressed: 
             keys_pressed[key] = False
         keys_pressed["left"] = True 
+        key_history.append("left")
 
     if key == K_RIGHT or key == K_d:#Right Arrow
-        last_input = "right"
         for key in keys_pressed:
             keys_pressed[key] = False
         keys_pressed["right"] = True
+        key_history.append("right")
 
     if key == K_UP or key == K_w:#Up Arrow
-        last_input = "up"
         for key in keys_pressed:
             keys_pressed[key] = False
         keys_pressed["up"] = True
+        key_history.append("up")
 
     if key == K_DOWN or key == K_s:#Down arrow
-        last_input = "down"
         for key in keys_pressed:
             keys_pressed[key] = False
         keys_pressed["down"] = True
+        key_history.append("down")
 
-    return last_input
+    return key_history
 
 def generate_apples():
     x = random.randint(1, width - 1)
@@ -163,11 +166,10 @@ def move_tails(pos, tails):
 
     return new_tails
 
-
 def main():
     x, y = width//2 - 10, heigth//2 - 10#The x and y of the snake
     score = 0
-    tails = []
+    tails, key_history = [], []
 
     keys_pressed = {"left":False, "right":False, "up":False, "down":False}#the values that will turn True when the apopriate key is pressed
     no_apple, run, lost = True, True, False
@@ -184,13 +186,12 @@ def main():
                 break
 
             if event.type == pygame.KEYDOWN:
-                handle_keys(event.key, keys_pressed)
+                key_history = handle_keys(event.key, keys_pressed, key_history)
                 
         if run:
-            
             draw_snake(x, y)
             draw_tails(tails)
-            x, y, lost, last_movement = move_snake(x, y, keys_pressed["left"], keys_pressed["right"], keys_pressed["up"], keys_pressed["down"], score)
+            x, y, lost, last_movement= move_snake(x, y, keys_pressed)
             tails = move_tails((last_movement), tails)
 
             if no_apple:
@@ -200,7 +201,7 @@ def main():
             pygame.draw.circle(win, (255, 0, 0), (apple_x, apple_y), 10)#Draws the apple's
             no_apple = handle_colision(apple_x, apple_y, x, y)
 
-            if no_apple == True:#The snake colided with the apple increase the ponints by 1
+            if no_apple == True:#The snake colided with the apple
                 eating.play()
                 score += 1
                 tails.append(last_movement)
@@ -219,7 +220,6 @@ def main():
                 run = False
                 break
 
-            
             pygame.display.update()
             win.fill(black)#fills the background color
             
