@@ -18,13 +18,13 @@ fps = 10
 
 #Sonds effects
 pygame.mixer.init() 
-weee = pygame.mixer.Sound(r"assets/weee.mp3")
-windows_xp = pygame.mixer.Sound(r"assets/windows_xp.mp3")
-classic_hurt = pygame.mixer.Sound(r"assets/classic_hurt.mp3")
-horn = pygame.mixer.Sound(r"assets/horn.mp3")
-windows_xp2 = pygame.mixer.Sound("assets/windows_xp2.mp3") 
-eating = pygame.mixer.Sound(r"assets/eating.mp3")
-themeSong = pygame.mixer.Sound(r"assets/themeSong.mp3")
+weee = pygame.mixer.Sound(r"Assets/weee.mp3")
+windows_xp = pygame.mixer.Sound(r"Assets/windows_xp.mp3")
+classic_hurt = pygame.mixer.Sound(r"Assets/classic_hurt.mp3")
+horn = pygame.mixer.Sound(r"Assets/horn.mp3")
+windows_xp2 = pygame.mixer.Sound("Assets/windows_xp2.mp3") 
+eating = pygame.mixer.Sound(r"Assets/eating.mp3")
+themeSong = pygame.mixer.Sound(r"Assets/ThemeSong.mp3")
 themeSong.play(-1)
 
 font = pygame.font.Font('freesansbold.ttf', 20)
