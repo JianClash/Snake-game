@@ -48,7 +48,7 @@ class Snake():
 
     def move(self, keys_pressed):
         lost = False
-        last_movement = (self.x, self.y)
+        self.last_movement = (self.x, self.y)
 
         if keys_pressed["left"]:
             if self.x - snake_vel < 0:
@@ -74,7 +74,29 @@ class Snake():
             else:
                 self.y += snake_size
 
-        return self.x, self.y, lost, last_movement
+        return self.x, self.y, lost
+
+    def draw_tails(self,tails):
+        for i in tails:
+            tail = pygame.Rect(i[0], i[1], self.size, self.size)
+            pygame.draw.rect(win, tail_color, tail)
+
+
+    def handle_colision(self, apple_x, apple_y):
+        apple = pygame.Rect(apple_x, apple_y, 10, 10)
+        snake = pygame.Rect(self.x, self.y, self.size, self.size)
+
+        if apple.colliderect(snake):
+            return True
+        return False
+
+
+    def move_tails(pos, tails):
+        new_tails = []
+        for tail in tails:
+            new_tails.append(pos)
+            pos = tail
+        return new_tails
 
 #Handles the key presses by turning the apopriate value to true and others to false 
 def handle_keys(key, keys_pressed, key_history):
@@ -109,13 +131,6 @@ def generate_apples():
     y = random.randint(1, heigth - 1)
     return x, y
 
-def handle_colision(apple_x, apple_y, x, y):
-    apple = pygame.Rect(apple_x, apple_y, 10, 10)
-    snake = pygame.Rect(x, y, 20, 20)
-
-    if apple.colliderect(snake):
-        return True
-    return False
 
 def display_points(points):
     text = font.render(f"Score: {points}", True, white)
@@ -161,18 +176,8 @@ def get_high_score(score):
 
     return int(high_score)
 
-def draw_tails(tails):
-    for i in tails:
-        tail = pygame.Rect(i[0], i[1], snake_size, snake_size)
-        pygame.draw.rect(win, tail_color, tail)
 
-def move_tails(pos, tails):
-    new_tails = []
-    for tail in tails:
-        new_tails.append(pos)
-        pos = tail
 
-    return new_tails
 
 def main():
     x, y = width//2 - 10, heigth//2 - 10#The x and y of the snake
@@ -199,16 +204,16 @@ def main():
                 
         if run:
             snake.draw() 
-            draw_tails(tails)
-            x, y, lost, last_movement = snake.move(keys_pressed)
-            tails = move_tails(last_movement, tails)
+            snake.draw_tails(tails)
+            x, y, lost = snake.move(keys_pressed)
+            tails = snake.move_tails(tails)
 
             if no_apple:
                 apple_x, apple_y = generate_apples()
                 no_apple = False
 
             pygame.draw.circle(win, (255, 0, 0), (apple_x, apple_y), 10)#Draws the apple's
-            no_apple = handle_colision(apple_x, apple_y, x, y)
+            no_apple = snake.handle_colision(apple_x, apple_y)
 
             if no_apple == True:#The snake colided with the apple
                 eating.play()
