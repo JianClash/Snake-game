@@ -4,7 +4,6 @@ from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_s, K_w
 
 pygame.init()
 width, heigth = 1300, 700
-
 snake_color = (0,255,0)
 tail_color = (0,255,0)
 black = (0, 0, 0)
@@ -12,7 +11,7 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 
 snake_size = 20
-vel = 2
+snake_vel = 2
 fps = 10
 
 
@@ -33,40 +32,49 @@ death_font = pygame.font.Font('freesansbold.ttf', 32)
 win = pygame.display.set_mode((width, heigth))
 pygame.display.set_caption('Snake game')
 
-def draw_snake(x, y):
-    snake = pygame.Rect(x, y, snake_size, snake_size)
-    pygame.draw.rect(win, snake_color, snake)
 
-#Moves the snake by updating the x and y values
-def move_snake(x, y, keys_pressed):
-    last_movement = (x, y)
-    lost = False
+class Snake():
+    def __init__(self, snake_size, snake_color, snake_vel, tail_color, x, y):
+        self.size = snake_size
+        self.color = snake_color
+        self.vel = snake_vel
+        self.tail_color = tail_color        
+        self.x = x
+        self.y = y
 
-    if keys_pressed["left"]:
-        if x - vel < 0:
-            lost = True
-        else:
-            x -= snake_size
+    def draw(self):
+        snake = pygame.Rect(self.x, self.y, self.size, self.size)
+        pygame.draw.rect(win, self.color, snake)
 
-    if keys_pressed["right"]:
-        if x + vel + 20 > width:
-            lost = True
-        else:
-            x += snake_size
+    def move(self, keys_pressed):
+        lost = False
+        last_movement = (self.x, self.y)
 
-    if keys_pressed["up"]:
-        if y - vel < 0:
-            lost = True
-        else:
-            y -= snake_size
+        if keys_pressed["left"]:
+            if self.x - snake_vel < 0:
+                lost = True
+            else:
+                self.x -= snake_size
 
-    if keys_pressed["down"]:
-        if y + vel + 20 > heigth:
-            lost = True
-        else:
-            y += snake_size
+        if keys_pressed["right"]:
+            if self.x + snake_vel + 20 > width:
+                lost = True
+            else:
+                self.x += snake_size
 
-    return x, y, lost, last_movement
+        if keys_pressed["up"]:
+            if self.y - snake_vel < 0:
+                lost = True
+            else:
+                self.y -= snake_size
+
+        if keys_pressed["down"]:
+            if self.y + snake_vel + 20 > heigth:
+                lost = True
+            else:
+                self.y += snake_size
+
+        return self.x, self.y, lost, last_movement
 
 #Handles the key presses by turning the apopriate value to true and others to false 
 def handle_keys(key, keys_pressed, key_history):
@@ -168,6 +176,7 @@ def move_tails(pos, tails):
 
 def main():
     x, y = width//2 - 10, heigth//2 - 10#The x and y of the snake
+    snake = Snake(snake_size, snake_color, snake_vel, tail_color, x, y)
     score = 0
     tails, key_history = [], []
 
@@ -189,10 +198,10 @@ def main():
                 key_history = handle_keys(event.key, keys_pressed, key_history)
                 
         if run:
-            draw_snake(x, y)
+            snake.draw() 
             draw_tails(tails)
-            x, y, lost, last_movement= move_snake(x, y, keys_pressed)
-            tails = move_tails((last_movement), tails)
+            x, y, lost, last_movement = snake.move(keys_pressed)
+            tails = move_tails(last_movement, tails)
 
             if no_apple:
                 apple_x, apple_y = generate_apples()
@@ -222,5 +231,6 @@ def main():
 
             pygame.display.update()
             win.fill(black)#fills the background color
-            
-main()
+     
+if __name__ == '__main__':
+    main()
