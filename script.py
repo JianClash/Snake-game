@@ -48,7 +48,7 @@ class Snake():
 
     def move(self, keys_pressed):
         lost = False
-        self.last_movement = (self.x, self.y)
+        last_movement = (self.x, self.y)
 
         if keys_pressed["left"]:
             if self.x - snake_vel < 0:
@@ -74,7 +74,7 @@ class Snake():
             else:
                 self.y += snake_size
 
-        return self.x, self.y, lost
+        return self.x, self.y, lost, last_movement
 
     def draw_tails(self,tails):
         for i in tails:
@@ -89,14 +89,6 @@ class Snake():
         if apple.colliderect(snake):
             return True
         return False
-
-
-    def move_tails(pos, tails):
-        new_tails = []
-        for tail in tails:
-            new_tails.append(pos)
-            pos = tail
-        return new_tails
 
 #Handles the key presses by turning the apopriate value to true and others to false 
 def handle_keys(key, keys_pressed, key_history):
@@ -178,6 +170,13 @@ def get_high_score(score):
 
 
 
+def move_tails(pos, tails):
+    new_tails = []
+    for tail in tails:
+        new_tails.append(pos)
+        pos = tail
+
+    return new_tails
 
 def main():
     x, y = width//2 - 10, heigth//2 - 10#The x and y of the snake
@@ -205,8 +204,8 @@ def main():
         if run:
             snake.draw() 
             snake.draw_tails(tails)
-            x, y, lost = snake.move(keys_pressed)
-            tails = snake.move_tails(tails)
+            x, y, lost, last_movement = snake.move(keys_pressed)
+            tails = move_tails(last_movement, tails)
 
             if no_apple:
                 apple_x, apple_y = generate_apples()
