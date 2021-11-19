@@ -16,7 +16,7 @@ fps = 10
 
 
 #Sonds effects
-pygame.mixer.init() 
+pygame.mixer.init()
 weee = pygame.mixer.Sound(r"Assets/weee.mp3")
 windows_xp = pygame.mixer.Sound(r"Assets/windows_xp.mp3")
 classic_hurt = pygame.mixer.Sound(r"Assets/classic_hurt.mp3")
@@ -38,7 +38,7 @@ class Snake():
         self.size = snake_size
         self.color = snake_color
         self.vel = snake_vel
-        self.tail_color = tail_color        
+        self.tail_color = tail_color
         self.x = x
         self.y = y
 
@@ -235,6 +235,6 @@ def main():
 
             pygame.display.update()
             win.fill(black)#fills the background color
-     
+
 if __name__ == '__main__':
     main()
