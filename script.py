@@ -119,8 +119,8 @@ def handle_keys(key, keys_pressed, key_history):
     return key_history
 
 def generate_apples():
-    x = random.randint(1, width - 1)
-    y = random.randint(1, heigth - 1)
+    x = random.randrange(0, width, snake_size)
+    y = random.randrange(0, heigth, snake_size)
     return x, y
 
 
@@ -211,7 +211,7 @@ def main():
                 apple_x, apple_y = generate_apples()
                 no_apple = False
 
-            pygame.draw.circle(win, (255, 0, 0), (apple_x, apple_y), 10)#Draws the apple's
+            pygame.draw.circle(win, (255, 0, 0), (apple_x + (snake_size//2), apple_y+(snake_size//2)), 10)#Draws the apple's
             no_apple = snake.handle_colision(apple_x, apple_y)
 
             if no_apple == True:#The snake colided with the apple
